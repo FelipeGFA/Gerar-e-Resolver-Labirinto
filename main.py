@@ -1,7 +1,6 @@
 import pygame
 from labirinto import *
 
-
 def tela_inicial():
     pygame.init()
     tela = pygame.display.set_mode((500, 300))
@@ -18,6 +17,8 @@ def tela_inicial():
     ]
     entrada_dimensoes = ""
     entrada_taxa = ""
+    valor_dimensoes_render = fonte.render("", True, (0, 0, 0))
+    valor_taxa_render = fonte.render("", True, (0, 0, 0))
     foco_dimensoes = True
 
     while True:
@@ -25,16 +26,11 @@ def tela_inicial():
         tela.blit(texto_dimensoes, (20, 20))
         tela.blit(texto_taxa, (20, 100))
 
-        pygame.draw.rect(tela, (0, 0, 0), (20, 40, 300, 30), 2)
-        pygame.draw.rect(tela, (0, 0, 0), (20, 120, 300, 30), 2)
+        pygame.draw.rect(tela, (0, 0, 0), (20, 40, 300, 30), 2 if foco_dimensoes else 1)
+        pygame.draw.rect(tela, (0, 0, 0), (20, 120, 300, 30), 2 if not foco_dimensoes else 1)
 
-        if foco_dimensoes:
-            pygame.draw.rect(tela, (150, 150, 150), (20, 40, 300, 30))
-        else:
-            pygame.draw.rect(tela, (150, 150, 150), (20, 120, 300, 30))
-
-        tela.blit(fonte.render(entrada_dimensoes, True, (0, 0, 0)), (25, 45))
-        tela.blit(fonte.render(entrada_taxa, True, (0, 0, 0)), (25, 125))
+        tela.blit(valor_dimensoes_render, (25, 45))
+        tela.blit(valor_taxa_render, (25, 125))
 
         # Exibir instruções
         for i, instrucao in enumerate(instrucoes):
@@ -51,6 +47,7 @@ def tela_inicial():
                 if evento.key == pygame.K_RETURN:
                     if foco_dimensoes:
                         foco_dimensoes = False
+                        valor_dimensoes_render = fonte.render(entrada_dimensoes, True, (0, 0, 0))
                     else:
                         dimensao = int(entrada_dimensoes) if entrada_dimensoes else 50
                         taxa_atualizacao = int(entrada_taxa) if entrada_taxa else 1
@@ -59,13 +56,17 @@ def tela_inicial():
                 elif evento.key == pygame.K_BACKSPACE:
                     if foco_dimensoes:
                         entrada_dimensoes = entrada_dimensoes[:-1]
+                        valor_dimensoes_render = fonte.render(entrada_dimensoes, True, (0, 0, 0))
                     else:
                         entrada_taxa = entrada_taxa[:-1]
+                        valor_taxa_render = fonte.render(entrada_taxa, True, (0, 0, 0))
                 elif evento.unicode.isdigit():
                     if foco_dimensoes:
                         entrada_dimensoes += evento.unicode
+                        valor_dimensoes_render = fonte.render(entrada_dimensoes, True, (0, 0, 0))
                     else:
                         entrada_taxa += evento.unicode
+                        valor_taxa_render = fonte.render(entrada_taxa, True, (0, 0, 0))
                 elif evento.key == pygame.K_TAB:
                     foco_dimensoes = not foco_dimensoes
 
