@@ -39,7 +39,6 @@ def resolver_labirinto(labirinto, tela, tamanho_janela=910, taxa_atualizacao=1):
     
     pygame.init()
     fonte = pygame.font.Font(None, 32)
-    clock = pygame.time.Clock()
 
     # Renderizar o labirinto apenas uma vez
     tamanho_celula = min(tamanho_janela // labirinto.labirinto.shape[1], tamanho_janela // labirinto.labirinto.shape[0])
