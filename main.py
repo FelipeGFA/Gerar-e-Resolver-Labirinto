@@ -17,8 +17,6 @@ def tela_inicial():
     ]
     entrada_dimensoes = ""
     entrada_taxa = ""
-    valor_dimensoes_render = fonte.render("", True, (0, 0, 0))
-    valor_taxa_render = fonte.render("", True, (0, 0, 0))
     foco_dimensoes = True
 
     while True:
@@ -26,11 +24,16 @@ def tela_inicial():
         tela.blit(texto_dimensoes, (20, 20))
         tela.blit(texto_taxa, (20, 100))
 
-        pygame.draw.rect(tela, (0, 0, 0), (20, 40, 300, 30), 2 if foco_dimensoes else 1)
-        pygame.draw.rect(tela, (0, 0, 0), (20, 120, 300, 30), 2 if not foco_dimensoes else 1)
+        pygame.draw.rect(tela, (0, 0, 0), (20, 40, 300, 30), 2)
+        pygame.draw.rect(tela, (0, 0, 0), (20, 120, 300, 30), 2)
 
-        tela.blit(valor_dimensoes_render, (25, 45))
-        tela.blit(valor_taxa_render, (25, 125))
+        if foco_dimensoes:
+            pygame.draw.rect(tela, (150, 150, 150), (20, 40, 300, 30))
+        else:
+            pygame.draw.rect(tela, (150, 150, 150), (20, 120, 300, 30))
+
+        tela.blit(fonte.render(entrada_dimensoes, True, (0, 0, 0)), (25, 45))
+        tela.blit(fonte.render(entrada_taxa, True, (0, 0, 0)), (25, 125))
 
         # Exibir instruções
         for i, instrucao in enumerate(instrucoes):
@@ -47,7 +50,6 @@ def tela_inicial():
                 if evento.key == pygame.K_RETURN:
                     if foco_dimensoes:
                         foco_dimensoes = False
-                        valor_dimensoes_render = fonte.render(entrada_dimensoes, True, (0, 0, 0))
                     else:
                         dimensao = int(entrada_dimensoes) if entrada_dimensoes else 50
                         taxa_atualizacao = int(entrada_taxa) if entrada_taxa else 1
@@ -56,41 +58,36 @@ def tela_inicial():
                 elif evento.key == pygame.K_BACKSPACE:
                     if foco_dimensoes:
                         entrada_dimensoes = entrada_dimensoes[:-1]
-                        valor_dimensoes_render = fonte.render(entrada_dimensoes, True, (0, 0, 0))
                     else:
                         entrada_taxa = entrada_taxa[:-1]
-                        valor_taxa_render = fonte.render(entrada_taxa, True, (0, 0, 0))
                 elif evento.unicode.isdigit():
                     if foco_dimensoes:
                         entrada_dimensoes += evento.unicode
-                        valor_dimensoes_render = fonte.render(entrada_dimensoes, True, (0, 0, 0))
                     else:
                         entrada_taxa += evento.unicode
-                        valor_taxa_render = fonte.render(entrada_taxa, True, (0, 0, 0))
                 elif evento.key == pygame.K_TAB:
                     foco_dimensoes = not foco_dimensoes
 
 def main():
-    running = True
-    while running:
-        dimensao, taxa_atualizacao = tela_inicial()
-        if dimensao is not None and taxa_atualizacao is not None:
-            pygame.init()
-            tela = pygame.display.set_mode((910, 910))
-            pygame.display.set_caption("Labirinto")
-            labirinto = Labirinto(dimensao)
-            tela_resolvida = resolver_labirinto(labirinto, tela, taxa_atualizacao=taxa_atualizacao)
-            while True:
-                for evento in pygame.event.get():
-                    if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
-                        break
-                    elif evento.type == pygame.QUIT:
-                        running = False
-                        break
-                else:
-                    continue
-                pygame.quit()
-                break
+    dimensao, taxa_atualizacao = tela_inicial()
+    if dimensao is not None and taxa_atualizacao is not None:
+        pygame.init()
+        tela = pygame.display.set_mode((910, 910))
+        pygame.display.set_caption("Labirinto")
+        labirinto = Labirinto(dimensao)
+        tela_resolvida, caminho = resolver_labirinto(labirinto, tela, taxa_atualizacao=taxa_atualizacao)
+        
+        # Animar o caminho encontrado
+        tamanho_celula = min(910 // labirinto.labirinto.shape[1], 910 // labirinto.labirinto.shape[0])
+        deslocamento_x = (910 - tamanho_celula * labirinto.labirinto.shape[1]) // 2
+        deslocamento_y = (910 - tamanho_celula * labirinto.labirinto.shape[0]) // 2
+        animar_caminho_encontrado(tela_resolvida, caminho, tamanho_celula, deslocamento_x, deslocamento_y)
+
+        while True:
+            for evento in pygame.event.get():
+                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+                    main()
+            pygame.display.flip()
 
 if __name__ == "__main__":
     main()
