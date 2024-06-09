@@ -71,18 +71,27 @@ def tela_inicial():
                     foco_dimensoes = not foco_dimensoes
 
 def main():
-    dimensao, taxa_atualizacao = tela_inicial()
-    if dimensao is not None and taxa_atualizacao is not None:
-        pygame.init()
-        tela = pygame.display.set_mode((910, 910))
-        pygame.display.set_caption("Labirinto")
-        labirinto = Labirinto(dimensao)
-        tela_resolvida = resolver_labirinto(labirinto, tela, taxa_atualizacao=taxa_atualizacao)
-        while True:
-            for evento in pygame.event.get():
-                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
-                    main()
-            pygame.display.flip()
+    running = True
+    while running:
+        dimensao, taxa_atualizacao = tela_inicial()
+        if dimensao is not None and taxa_atualizacao is not None:
+            pygame.init()
+            tela = pygame.display.set_mode((910, 910))
+            pygame.display.set_caption("Labirinto")
+            labirinto = Labirinto(dimensao)
+            tela_resolvida = resolver_labirinto(labirinto, tela, taxa_atualizacao=taxa_atualizacao)
+            while True:
+                for evento in pygame.event.get():
+                    if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+                        break
+                    elif evento.type == pygame.QUIT:
+                        running = False
+                        break
+                else:
+                    continue
+                pygame.quit()
+                break
 
 if __name__ == "__main__":
     main()
+
